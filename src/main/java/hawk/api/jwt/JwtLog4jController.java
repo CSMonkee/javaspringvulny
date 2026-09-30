@@ -16,15 +16,22 @@ public class JwtLog4jController {
 
     private static final Logger logger = LogManager.getLogger(JwtLog4jController.class);
 
+    private static String sanitizeLogInput(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replace("\r", "").replace("\n", "");
+    }
+
     @GetMapping("/log4j")
     public ResponseEntity logRequest(@RequestParam String text, HttpServletRequest request) {
         Enumeration<String> headers = request.getHeaderNames();
         while (headers.hasMoreElements()) {
             String it = headers.nextElement();
-            logger.info("{} = {}", it, request.getHeader(it));
+            logger.info("{} = {}", sanitizeLogInput(it), sanitizeLogInput(request.getHeader(it)));
         }
         logger.info("Hitting Log4J route");
-        logger.info(text);
+        logger.info(sanitizeLogInput(text));
         return ResponseEntity.ok().build();
     }
 
